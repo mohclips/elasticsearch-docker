@@ -1,0 +1,142 @@
+version: '3.7'
+
+#
+# the underlying host/vm needs this config setting or ES nodes will not boot fully
+#   with a bootstrap failure
+#
+# myhostmachine$ sudo sysctl -w vm.max_map_count=262144
+#
+
+# test all ok with  curl http://localhost:9200/_cluster/health?pretty
+
+services:
+  es01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.1
+    container_name: es01
+    environment:
+      node.name: es01
+      discovery.seed_hosts: es02,es03
+    #load in common ES settings/config
+    env_file:
+      - es-common-vars.env
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - ./data01:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - elastic
+    # check health here:   docker inspect --format='{{json .State.Health}}' es01
+    healthcheck:
+      test: ["CMD-SHELL", "curl --silent --fail localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+      start_period: 1m
+
+
+  es02:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.1
+    container_name: es02
+    environment:
+      - node.name=es02
+      - discovery.seed_hosts=es01,es03
+    #load in common ES settings/config
+    env_file:
+      - es-common-vars.env
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - ./data02:/usr/share/elasticsearch/data
+    ports:
+      - 9202:9200
+    networks:
+      - elastic
+    healthcheck:
+      test: ["CMD-SHELL", "curl --silent --fail localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+      start_period: 1m
+
+
+  es03:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.1
+    container_name: es03
+    environment:
+      - node.name=es03
+      - discovery.seed_hosts=es01,es02
+    #load in common ES settings/config
+    env_file:
+      - es-common-vars.env
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - ./data03:/usr/share/elasticsearch/data
+    ports:
+      - 9203:9200
+    networks:
+      - elastic
+    healthcheck:
+      test: ["CMD-SHELL", "curl --silent --fail localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+      start_period: 1m
+
+  #
+  # takes around 3mins to come up live
+  #
+  kb01:
+    image: docker.elastic.co/kibana/kibana:7.9.1
+    container_name: kb01
+    ports:
+      - 5601:5601
+    environment:
+      ELASTICSEARCH_URL: http://es01:9200
+      ELASTICSEARCH_HOSTS: http://es01:9200
+      elasticsearch.username: elastic 
+      elasticsearch.password: password
+      newsfeed.enabled: 'false'
+    networks:
+      - elastic
+    volumes:
+      - ./kb01:/data
+      #- ./kibana.yml:/usr/share/kibana/config/kibana.yml
+    healthcheck:
+      test: ["CMD-SHELL", "curl --silent --fail http://localhost:5601/api/status || exit 1"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+      start_period: 3m
+
+
+  ls01:
+    image: docker.elastic.co/logstash/logstash:7.9.1
+    container_name: ls01
+    ports:
+      - 5445:5445
+      - 9601:9600
+    environment:
+      ELASTICSEARCH_URL: http://es01:9200
+      ELASTICSEARCH_HOSTS: http://es01:9200
+
+    networks:
+      - elastic
+    volumes:
+      - ./ls01/data/:/usr/share/logstash/data/
+      - ./ls01/config/:/usr/share/logstash/config/
+
+
+networks:
+  elastic:
+    driver: bridge
+
+
