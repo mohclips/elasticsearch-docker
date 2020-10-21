@@ -1,3 +1,49 @@
-- pipeline.id: generic-pipeline
-  path.config: "conf.d/*"
-  #pipeline.workers: 3
+# - pipeline.id: generic-pipeline
+#   path.config: "conf.d/*"
+#   #pipeline.workers: 3
+
+- pipeline.id: beats-server
+  config.string: |
+    #
+    # IMPORTANT: Please try and get the most used pipelines at the top.
+    #
+
+    input { beats { port => 5045 } }
+    output {
+      if "DNS" in [tags] {
+          pipeline { 
+            id => sendto_dnsquery
+            send_to => dnsquery 
+          }
+      } # end DNS
+
+      else if "Firewall" in [tags] {
+          pipeline { 
+            id => sendto_firewall
+            send_to => firewall
+          }
+      } # end firewall
+
+      # no more options :( 
+      else {
+        sink {
+          id => "default_sink"
+          enable_metric => true
+        } # drastic but no where else to go
+      }
+
+    } # output
+
+
+- pipeline.id: dns-processing
+  path.config: "/usr/share/logstash/config/conf.d/{dns-input,dns-filter,dns-output}.conf"
+
+- pipeline.id: firewall-processing
+  path.config: "/usr/share/logstash/config/conf.d/{firewall-input,firewall-filter,firewall-output}.conf"
+
+# catch all
+# logging no processing
+# send to logstash only
+- pipeline.id: catchall-no-processing
+  path.config: "/usr/share/logstash/config/conf.d/{catchall-input,catchall-filter,catchall-output}.conf"
+

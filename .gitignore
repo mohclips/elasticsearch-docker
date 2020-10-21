@@ -1,3 +1,4 @@
 data0?/nodes/*
 .lock
 uuid
+ls01/config/hostsfile

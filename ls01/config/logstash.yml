@@ -1,0 +1,17 @@
+
+# port 9600 API listener - http only at present
+http.host: "0.0.0.0"
+
+pipeline.unsafe_shutdown: true
+
+path.data: /usr/share/logstash/data/
+
+#log.level: debug
+
+# config.reload.automatic: false
+# config.reload.interval: 3s
+
+# No metricbeats included in the container so use legacy monitoring
+xpack.monitoring.enabled: true
+xpack.monitoring.elasticsearch.hosts: [ "http://es01:9200" ]
+
