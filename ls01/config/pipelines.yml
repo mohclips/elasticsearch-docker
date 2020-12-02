@@ -24,6 +24,13 @@
           }
       } # end firewall
 
+      else if "Docker" in [tags] {
+          pipeline { 
+            id => sendto_docker
+            send_to => docker
+          }
+      } # end firewall
+
       # no more options :( 
       else {
         sink {
@@ -40,6 +47,9 @@
 
 - pipeline.id: firewall-processing
   path.config: "/usr/share/logstash/config/conf.d/{firewall-input,firewall-filter,firewall-output}.conf"
+
+- pipeline.id: docker-processing
+  path.config: "/usr/share/logstash/config/conf.d/{docker-input,docker-filter,docker-output}.conf"
 
 # catch all
 # logging no processing
