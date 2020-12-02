@@ -147,6 +147,8 @@ services:
 
       # does not work as we are not using cpu throttling
       XPACK_MONITORING_UI_CONTAINER_ELASTICSEARCH_ENABLED: 'true'
+
+      XPACK_SECURITY_AUDIT_ENABLED: 'true'
     # hardware throttling
     cpus: 4
     mem_limit: 6g
