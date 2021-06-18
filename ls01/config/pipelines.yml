@@ -54,6 +54,6 @@
 # catch all
 # logging no processing
 # send to logstash only
-- pipeline.id: catchall-no-processing
-  path.config: "/usr/share/logstash/config/conf.d/{catchall-input,catchall-filter,catchall-output}.conf"
+#- pipeline.id: catchall-no-processing
+#  path.config: "/usr/share/logstash/config/conf.d/{catchall-input,catchall-filter,catchall-output}.conf"
 
