@@ -17,7 +17,7 @@ version: "2.4"
 
 services:
   es01:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.1
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.13.0
     container_name: es01
     restart: always
     environment:
@@ -53,7 +53,7 @@ services:
       start_period: 1m
 
   es02:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.1
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.13.0
     container_name: es02
     restart: always
     environment:
@@ -88,7 +88,7 @@ services:
       start_period: 1m
 
   es03:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.1
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.13.0
     container_name: es03
     restart: always
     environment:
@@ -126,7 +126,7 @@ services:
   # takes around 3mins to come up live
   #
   kb01:
-    image: docker.elastic.co/kibana/kibana:7.9.1
+    image: docker.elastic.co/kibana/kibana:7.13.0
     container_name: kb01
     restart: always
     ports:
@@ -170,7 +170,7 @@ services:
       start_period: 3m
 
   ls01:
-    image: docker.elastic.co/logstash/logstash:7.9.1
+    image: docker.elastic.co/logstash/logstash:7.13.0
     container_name: ls01
     restart: always
     ports:
