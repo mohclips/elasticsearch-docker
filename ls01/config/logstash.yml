@@ -8,8 +8,8 @@ path.data: /usr/share/logstash/data/
 
 #log.level: debug
 
-# config.reload.automatic: false
-# config.reload.interval: 3s
+config.reload.automatic: true
+config.reload.interval: 5s
 
 # No metricbeats included in the container so use legacy monitoring
 xpack.monitoring.enabled: true
