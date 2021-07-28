@@ -131,24 +131,6 @@ services:
     restart: always
     ports:
       - 5601:5601
-    environment:
-      ELASTICSEARCH_URL: http://es01:9200
-      ELASTICSEARCH_HOSTS: http://es01:9200
-
-      NEWSFEED_ENABLED: "false"
-      MONITORING_UI_CONTAINER_ELASTICSEARCH_ENABLED: "true"
-      SERVER_NAME: "kb01"
-      XPACK_REPORTING_KIBANASERVER_HOSTNAME: "0.0.0.0"
-      XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY: "123456789012345678901234567890abcdefghi"
-      XPACK_REPORTING_ENCRYPTIONKEY: "123456789012345678901234567890abcdefghi"
-      XPACK_SECURITY_ENCRYPTIONKEY: "123456789012345678901234567890abcdefghi"
-
-      MONITORING_CLUSTER_ALERTS_EMAIL_NOTIFICATIONS_EMAIL_ADDRESS: "root@localhost.local"
-
-      # does not work as we are not using cpu throttling
-      XPACK_MONITORING_UI_CONTAINER_ELASTICSEARCH_ENABLED: 'true'
-
-      XPACK_SECURITY_AUDIT_ENABLED: 'true'
     # hardware throttling
     cpus: 4
     mem_limit: 6g
@@ -157,7 +139,11 @@ services:
       - elastic
     volumes:
       - ./kb01:/data
-      #- ./kibana.yml:/usr/share/kibana/config/kibana.yml
+      # IMPORTANT! use own copy of the config
+      - ./kibana.yml:/usr/share/kibana/config/kibana.yml
+    #environment:
+    #  - ELASTICSEARCH_USERNAME=elastic
+    #  - ELASTICSEARCH_PASSWORD=Password01
     healthcheck:
       test:
         [
@@ -200,6 +186,32 @@ services:
       timeout: 30s
       retries: 3
       #start_period: 1m
+
+
+#  fs01:
+#    image: docker.elastic.co/beats/elastic-agent:7.13.0
+#    depends_on:
+#      es01:
+#        condition: service_healthy
+#      kb01:
+#        condition: service_healthy
+#    healthcheck:
+#      test: "curl -f http://127.0.0.1:8220/api/status | grep HEALTHY 2>&1 >/dev/null"
+#      retries: 12
+#      interval: 5s
+#    hostname: docker-fleet-server
+#    environment:
+#      - "FLEET_SERVER_ENABLE=1"
+#      - "FLEET_SERVER_INSECURE_HTTP=1"
+#      - "KIBANA_FLEET_SETUP=1"
+#      - "KIBANA_FLEET_HOST=http://kb01:5601"
+#      - "FLEET_SERVER_HOST=0.0.0.0"
+#      - "STATE_PATH=/usr/share/elastic-agent"
+#    ports:
+#      - "8220:8220"
+#    networks:
+#      - elastic  
+
 networks:
   elastic:
     driver: bridge

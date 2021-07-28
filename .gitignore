@@ -4,3 +4,5 @@ uuid
 ls01/config/hostsfile
 ls01/data/plugins/filters/geoip/GeoLite2-City.mmdb
 ls01/data/plugins/filters/geoip/GeoLite2-ASN.mmdb
+index_sizer/*
+lost+found
